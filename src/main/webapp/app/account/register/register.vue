@@ -4,13 +4,10 @@
       <div class="col-md-8 toastify-container">
         <h1 id="register-title" data-cy="registerTitle">{{ t$('register.title') }}</h1>
 
-        <div class="alert alert-success" role="alert" v-if="success" v-html="t$('register.messages.success')"></div>
-
-        <div class="alert alert-danger" role="alert" v-if="error" v-html="t$('register.messages.error.fail')"></div>
-
-        <div class="alert alert-danger" role="alert" v-if="errorUserExists" v-html="t$('register.messages.error.userexists')"></div>
-
-        <div class="alert alert-danger" role="alert" v-if="errorEmailExists" v-html="t$('register.messages.error.emailexists')"></div>
+        <Message v-if="success" severity="success">{{ t$('register.messages.success') }}</Message>
+        <Message v-if="error" severity="error">{{ t$('register.messages.error.fail') }}</Message>
+        <Message v-if="errorUserExists" severity="error">{{ t$('register.messages.error.userexists') }}</Message>
+        <Message v-if="errorEmailExists" severity="error">{{ t$('register.messages.error.emailexists') }}</Message>
       </div>
     </div>
     <div class="d-flex justify-content-center">
@@ -18,132 +15,72 @@
         <form id="register-form" name="registerForm" @submit.prevent="register()" v-if="!success" no-validate>
           <div class="mb-3">
             <label class="form-control-label" for="username">{{ t$("global.form['username.label']") }}</label>
-            <input
-              type="text"
-              class="form-control"
-              v-model="v$.registerAccount.login.$model"
+            <InputText
               id="username"
+              v-model="login"
               name="login"
-              :class="{ 'is-valid': !v$.registerAccount.login.$invalid, 'is-invalid': v$.registerAccount.login.$invalid }"
-              required
-              minlength="1"
-              maxlength="50"
-              pattern="^[a-zA-Z0-9!#$&'*+=?^_`{|}~.-]+@?[a-zA-Z0-9-]+(?:\.[a-zA-Z0-9-]+)*$"
+              class="w-100"
+              :class="{ 'p-invalid': loginMeta.touched && loginErrorMessage }"
               :placeholder="t$('global.form[\'username.placeholder\']')"
               data-cy="username"
             />
-            <div v-if="v$.registerAccount.login.$anyDirty && v$.registerAccount.login.$invalid">
-              <small class="form-text text-danger" v-if="v$.registerAccount.login.required.$invalid">{{
-                t$('register.messages.validate.login.required')
-              }}</small>
-              <small class="form-text text-danger" v-if="v$.registerAccount.login.minLength.$invalid">{{
-                t$('register.messages.validate.login.minlength')
-              }}</small>
-              <small class="form-text text-danger" v-if="v$.registerAccount.login.maxLength.$invalid">{{
-                t$('register.messages.validate.login.maxlength')
-              }}</small>
-              <small class="form-text text-danger" v-if="v$.registerAccount.login.pattern.$invalid">{{
-                t$('register.messages.validate.login.pattern')
-              }}</small>
-            </div>
+            <small v-if="loginMeta.touched && loginErrorMessage" class="form-text text-danger">{{ loginErrorMessage }}</small>
           </div>
           <div class="mb-3">
             <label class="form-control-label" for="email">{{ t$("global.form['email.label']") }}</label>
-            <input
-              type="email"
-              class="form-control"
+            <InputText
               id="email"
+              v-model="email"
               name="email"
-              :class="{ 'is-valid': !v$.registerAccount.email.$invalid, 'is-invalid': v$.registerAccount.email.$invalid }"
-              v-model="v$.registerAccount.email.$model"
-              minlength="5"
-              maxlength="254"
-              email
-              required
+              type="email"
+              class="w-100"
+              :class="{ 'p-invalid': emailMeta.touched && emailErrorMessage }"
               :placeholder="t$('global.form[\'email.placeholder\']')"
               data-cy="email"
             />
-            <div v-if="v$.registerAccount.email.$anyDirty && v$.registerAccount.email.$invalid">
-              <small class="form-text text-danger" v-if="v$.registerAccount.email.required.$invalid">{{
-                t$('global.messages.validate.email.required')
-              }}</small>
-              <small class="form-text text-danger" v-if="v$.registerAccount.email.email.$invalid">{{
-                t$('global.messages.validate.email.invalid')
-              }}</small>
-              <small class="form-text text-danger" v-if="v$.registerAccount.email.minLength.$invalid">{{
-                t$('global.messages.validate.email.minlength')
-              }}</small>
-              <small class="form-text text-danger" v-if="v$.registerAccount.email.maxLength.$invalid">{{
-                t$('global.messages.validate.email.maxlength')
-              }}</small>
-            </div>
+            <small v-if="emailMeta.touched && emailErrorMessage" class="form-text text-danger">{{ emailErrorMessage }}</small>
           </div>
           <div class="mb-3">
             <label class="form-control-label" for="firstPassword">{{ t$("global.form['newpassword.label']") }}</label>
-            <input
-              type="password"
-              class="form-control"
+            <Password
               id="firstPassword"
+              v-model="password"
               name="password"
-              :class="{ 'is-valid': !v$.registerAccount.password.$invalid, 'is-invalid': v$.registerAccount.password.$invalid }"
-              v-model="v$.registerAccount.password.$model"
-              minlength="4"
-              maxlength="50"
-              required
+              class="w-100"
+              :feedback="false"
+              toggle-mask
+              :input-class="passwordMeta.touched && passwordErrorMessage ? 'p-invalid w-100' : 'w-100'"
               :placeholder="t$('global.form[\'newpassword.placeholder\']')"
               data-cy="firstPassword"
             />
-            <div v-if="v$.registerAccount.password.$anyDirty && v$.registerAccount.password.$invalid">
-              <small class="form-text text-danger" v-if="v$.registerAccount.password.required.$invalid">{{
-                t$('global.messages.validate.newpassword.required')
-              }}</small>
-              <small class="form-text text-danger" v-if="v$.registerAccount.password.minLength.$invalid">{{
-                t$('global.messages.validate.newpassword.minlength')
-              }}</small>
-              <small class="form-text text-danger" v-if="v$.registerAccount.password.maxLength.$invalid">{{
-                t$('global.messages.validate.newpassword.maxlength')
-              }}</small>
-            </div>
+            <small v-if="passwordMeta.touched && passwordErrorMessage" class="form-text text-danger">{{ passwordErrorMessage }}</small>
           </div>
           <div class="mb-3">
             <label class="form-control-label" for="secondPassword">{{ t$("global.form['confirmpassword.label']") }}</label>
-            <input
-              type="password"
-              class="form-control"
+            <Password
               id="secondPassword"
               name="confirmPasswordInput"
-              :class="{ 'is-valid': !v$.confirmPassword.$invalid, 'is-invalid': v$.confirmPassword.$invalid }"
-              v-model="v$.confirmPassword.$model"
-              minlength="4"
-              maxlength="50"
-              required
+              v-model="confirmPassword"
+              class="w-100"
+              :feedback="false"
+              toggle-mask
+              :input-class="confirmPasswordMeta.touched && confirmPasswordErrorMessage ? 'p-invalid w-100' : 'w-100'"
               :placeholder="t$('global.form[\'confirmpassword.placeholder\']')"
               data-cy="secondPassword"
             />
-            <div v-if="v$.confirmPassword.$dirty && v$.confirmPassword.$invalid">
-              <small class="form-text text-danger" v-if="v$.confirmPassword.required.$invalid">{{
-                t$('global.messages.validate.confirmpassword.required')
-              }}</small>
-              <small class="form-text text-danger" v-if="v$.confirmPassword.minLength.$invalid">{{
-                t$('global.messages.validate.confirmpassword.minlength')
-              }}</small>
-              <small class="form-text text-danger" v-if="v$.confirmPassword.maxLength.$invalid">{{
-                t$('global.messages.validate.confirmpassword.maxlength')
-              }}</small>
-              <small class="form-text text-danger" v-if="v$.confirmPassword.sameAsPassword">{{
-                t$('global.messages.error.dontmatch')
-              }}</small>
-            </div>
+            <small v-if="confirmPasswordMeta.touched && confirmPasswordErrorMessage" class="form-text text-danger">
+              {{ confirmPasswordErrorMessage }}
+            </small>
           </div>
 
-          <button type="submit" :disabled="v$.$invalid" class="btn btn-primary" data-cy="submit">{{ t$('register.form.button') }}</button>
+          <Button type="submit" :disabled="isSubmitting" data-cy="submit">{{ t$('register.form.button') }}</Button>
         </form>
         <p></p>
-        <div class="alert alert-warning">
+        <Message severity="warn">
           <span>{{ t$('global.messages.info.authenticated.prefix') }}</span>
-          <a class="alert-link" @click="showLogin()">{{ t$('global.messages.info.authenticated.link') }}</a
-          ><span v-html="t$('global.messages.info.authenticated.suffix')"></span>
-        </div>
+          <a class="alert-link" @click="showLogin()">{{ t$('global.messages.info.authenticated.link') }}</a>
+          <span>{{ t$('global.messages.info.authenticated.suffix') }}</span>
+        </Message>
       </div>
     </div>
   </div>
