@@ -5,3 +5,11 @@
 declare const SERVER_API_URL: string;
 declare const APP_VERSION: string;
 declare const I18N_HASH: string;
+
+interface ImportMetaEnv {
+  readonly VITE_SENTRY_DSN?: string;
+}
+
+interface ImportMeta {
+  readonly env: ImportMetaEnv;
+}

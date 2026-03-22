@@ -12,6 +12,9 @@ import TranslationService from '@/locale/translation.service';
 import { setupAxiosInterceptors } from '@/shared/config/axios-interceptor';
 import { initFortAwesome, initI18N } from '@/shared/config/config';
 import { initBootstrapVue } from '@/shared/config/config-bootstrap-vue';
+import { initPrimeVue } from '@/shared/config/config-primevue';
+import { initSentry } from '@/shared/config/config-sentry';
+import { initVueQuery } from '@/shared/config/config-vue-query';
 import JhiItemCount from '@/shared/jhi-item-count.vue';
 import JhiSortIndicator from '@/shared/sort/jhi-sort-indicator.vue';
 import { useStore, useTranslationStore } from '@/store';
@@ -19,6 +22,7 @@ import { useStore, useTranslationStore } from '@/store';
 import App from './app.vue';
 import router from './router';
 
+import '../content/styles/tailwind.css';
 import '../content/scss/global.scss';
 import '../content/scss/vendor.scss';
 
@@ -126,7 +130,9 @@ const app = createApp({
 });
 
 initFortAwesome(app);
-
 initBootstrapVue(app);
+initPrimeVue(app);
+initVueQuery(app);
+initSentry(app, router);
 
 app.component('JhiItemCount', JhiItemCount).component('JhiSortIndicator', JhiSortIndicator).use(router).use(pinia).use(i18n).mount('#app');
