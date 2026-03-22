@@ -1,8 +1,8 @@
 package com.panorise.fitrx.web.rest;
 
-import com.panorise.fitrx.repository.search.UserSearchRepository;
 import com.panorise.fitrx.service.UserService;
 import com.panorise.fitrx.service.dto.UserDTO;
+import com.panorise.fitrx.service.search.UserSearchService;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
@@ -31,11 +31,11 @@ public class PublicUserResource {
     private static final Logger LOG = LoggerFactory.getLogger(PublicUserResource.class);
 
     private final UserService userService;
-    private final UserSearchRepository userSearchRepository;
+    private final UserSearchService userSearchService;
 
-    public PublicUserResource(UserSearchRepository userSearchRepository, UserService userService) {
+    public PublicUserResource(UserSearchService userSearchService, UserService userService) {
         this.userService = userService;
-        this.userSearchRepository = userSearchRepository;
+        this.userSearchService = userSearchService;
     }
 
     /**
@@ -79,6 +79,6 @@ public class PublicUserResource {
      */
     @GetMapping("/users/_search/{query}")
     public Mono<List<UserDTO>> search(@PathVariable("query") String query) {
-        return userSearchRepository.search(query).map(UserDTO::new).collectList();
+        return userSearchService.search(query).map(UserDTO::new).collectList();
     }
 }

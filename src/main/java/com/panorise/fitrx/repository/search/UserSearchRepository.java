@@ -6,11 +6,13 @@ import org.springframework.data.elasticsearch.client.elc.NativeQuery;
 import org.springframework.data.elasticsearch.client.elc.ReactiveElasticsearchTemplate;
 import org.springframework.data.elasticsearch.core.SearchHit;
 import org.springframework.data.elasticsearch.repository.ReactiveElasticsearchRepository;
+import org.springframework.data.repository.NoRepositoryBean;
 import reactor.core.publisher.Flux;
 
 /**
  * Spring Data Elasticsearch repository for the User entity.
  */
+@NoRepositoryBean
 public interface UserSearchRepository extends ReactiveElasticsearchRepository<User, Long>, UserSearchRepositoryInternal {}
 
 interface UserSearchRepositoryInternal {

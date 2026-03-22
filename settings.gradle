@@ -24,21 +24,26 @@ plugins {
     id 'com.gradle.common-custom-user-data-gradle-plugin'
 }
 
-develocity {
-    server = "localhost"
-    buildScan {
-        captureTaskInputFiles = true
-        uploadInBackground = System.getenv("CI") == null // adjust to your CI provider
-        publishAlways()
+def develocityServer = System.getenv("DEVELOCITY_SERVER")
+
+if (develocityServer) {
+    develocity {
+        server = develocityServer
+        buildScan {
+            uploadInBackground = System.getenv("CI") == null // adjust to your CI provider
+            publishAlways()
+        }
     }
 }
 
 buildCache {
     local { enabled = true }
-    remote(HttpBuildCache) {
-        push = true
-        enabled = false // Disabled as this might not always desired
-        url = 'localhost/cache/' // note the trailing slash!
+    if (develocityServer) {
+        remote(HttpBuildCache) {
+            push = true
+            enabled = false // Disabled as this might not always desired
+            url = uri("${develocityServer}/cache/")
+        }
     }
 }
 rootProject.name = "fit-rx"

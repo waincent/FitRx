@@ -5,11 +5,11 @@ import com.panorise.fitrx.domain.Authority;
 import com.panorise.fitrx.domain.User;
 import com.panorise.fitrx.repository.AuthorityRepository;
 import com.panorise.fitrx.repository.UserRepository;
-import com.panorise.fitrx.repository.search.UserSearchRepository;
 import com.panorise.fitrx.security.AuthoritiesConstants;
 import com.panorise.fitrx.security.SecurityUtils;
 import com.panorise.fitrx.service.dto.AdminUserDTO;
 import com.panorise.fitrx.service.dto.UserDTO;
+import com.panorise.fitrx.service.search.UserSearchService;
 import java.time.Instant;
 import java.time.LocalDateTime;
 import java.time.ZoneOffset;
@@ -39,19 +39,19 @@ public class UserService {
 
     private final PasswordEncoder passwordEncoder;
 
-    private final UserSearchRepository userSearchRepository;
+    private final UserSearchService userSearchService;
 
     private final AuthorityRepository authorityRepository;
 
     public UserService(
         UserRepository userRepository,
         PasswordEncoder passwordEncoder,
-        UserSearchRepository userSearchRepository,
+        UserSearchService userSearchService,
         AuthorityRepository authorityRepository
     ) {
         this.userRepository = userRepository;
         this.passwordEncoder = passwordEncoder;
-        this.userSearchRepository = userSearchRepository;
+        this.userSearchService = userSearchService;
         this.authorityRepository = authorityRepository;
     }
 
@@ -66,7 +66,7 @@ public class UserService {
                 user.setActivationKey(null);
                 return saveUser(user);
             })
-            .flatMap(user -> userSearchRepository.save(user).thenReturn(user))
+            .flatMap(user -> userSearchService.save(user).thenReturn(user))
             .doOnNext(user -> LOG.debug("Activated user: {}", user));
     }
 
@@ -149,7 +149,7 @@ public class UserService {
                     .thenReturn(newUser)
                     .doOnNext(user -> user.setAuthorities(authorities))
                     .flatMap(this::saveUser)
-                    .flatMap(user -> userSearchRepository.save(user).thenReturn(user))
+                    .flatMap(user -> userSearchService.save(user).thenReturn(user))
                     .doOnNext(user -> LOG.debug("Created Information for User: {}", user));
             });
     }
@@ -183,7 +183,7 @@ public class UserService {
                 return newUser;
             })
             .flatMap(this::saveUser)
-            .flatMap(user1 -> userSearchRepository.save(user1).thenReturn(user1))
+            .flatMap(user1 -> userSearchService.save(user1).thenReturn(user1))
             .doOnNext(user1 -> LOG.debug("Created Information for User: {}", user1));
     }
 
@@ -217,7 +217,7 @@ public class UserService {
                     .then(Mono.just(user));
             })
             .flatMap(this::saveUser)
-            .flatMap(user -> userSearchRepository.save(user).thenReturn(user))
+            .flatMap(user -> userSearchService.save(user).thenReturn(user))
             .doOnNext(user -> LOG.debug("Changed Information for User: {}", user))
             .map(AdminUserDTO::new);
     }
@@ -227,7 +227,7 @@ public class UserService {
         return userRepository
             .findOneByLogin(login)
             .flatMap(user -> userRepository.delete(user).thenReturn(user))
-            .flatMap(user -> userSearchRepository.delete(user).thenReturn(user))
+            .flatMap(user -> userSearchService.delete(user).thenReturn(user))
             .doOnNext(user -> LOG.debug("Deleted User: {}", user))
             .then();
     }
@@ -256,7 +256,7 @@ public class UserService {
                 user.setImageUrl(imageUrl);
                 return saveUser(user);
             })
-            .flatMap(user -> userSearchRepository.save(user).thenReturn(user))
+            .flatMap(user -> userSearchService.save(user).thenReturn(user))
             .doOnNext(user -> LOG.debug("Changed Information for User: {}", user))
             .then();
     }
@@ -343,7 +343,7 @@ public class UserService {
                 LocalDateTime.ofInstant(Instant.now().minus(3, ChronoUnit.DAYS), ZoneOffset.UTC)
             )
             .flatMap(user -> userRepository.delete(user).thenReturn(user))
-            .flatMap(user -> userSearchRepository.delete(user).thenReturn(user))
+            .flatMap(user -> userSearchService.delete(user).thenReturn(user))
             .doOnNext(user -> LOG.debug("Deleted User: {}", user));
     }
 

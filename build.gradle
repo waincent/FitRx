@@ -22,7 +22,7 @@ java {
     sourceCompatibility=21
     targetCompatibility=21
 }
-assert System.properties["java.specification.version"] == "21" || "25"
+assert ["21", "25"].contains(System.properties["java.specification.version"])
 
 repositories {
     mavenCentral()
@@ -106,12 +106,8 @@ dependencies {
     testImplementation "org.springframework.security:spring-security-test"
     testImplementation "org.awaitility:awaitility"
     testImplementation "org.testcontainers:testcontainers"
-    testImplementation "org.testcontainers:testcontainers"
-    testImplementation "org.testcontainers:testcontainers"
     testImplementation "org.testcontainers:elasticsearch"
     testImplementation "org.testcontainers:jdbc"
-    testImplementation "org.testcontainers:junit-jupiter"
-    testImplementation "org.testcontainers:junit-jupiter"
     testImplementation "org.testcontainers:junit-jupiter"
     testImplementation "org.testcontainers:kafka"
     testImplementation "org.testcontainers:postgresql"

@@ -16,13 +16,11 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.boot.autoconfigure.liquibase.LiquibaseProperties;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.core.env.Environment;
-import org.springframework.data.elasticsearch.repository.config.EnableReactiveElasticsearchRepositories;
 import tech.jhipster.config.DefaultProfileUtil;
 import tech.jhipster.config.JHipsterConstants;
 
 @SpringBootApplication
 @EnableConfigurationProperties({ LiquibaseProperties.class, ApplicationProperties.class })
-@EnableReactiveElasticsearchRepositories("com.panorise.fitrx.repository.search")
 public class FitRxApp {
 
     private static final Logger LOG = LoggerFactory.getLogger(FitRxApp.class);
